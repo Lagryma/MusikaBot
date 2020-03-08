@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F0988C48-6FC1-4C69-AAD8-7F5D5A52FFEB}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <StartupObject>MusikaBotConsole.Module1</StartupObject>
+    <StartupObject>Sub Main</StartupObject>
     <RootNamespace>MusikaBotConsole</RootNamespace>
     <AssemblyName>MusikaBotConsole</AssemblyName>
     <FileAlignment>512</FileAlignment>
@@ -48,6 +48,9 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ConsoleHelper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\ConsoleHelper.1.2\lib\ConsoleHelper.dll</HintPath>
+    </Reference>
     <Reference Include="Discord.Net.Commands, Version=2.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Discord.Net.Commands.2.1.1\lib\net46\Discord.Net.Commands.dll</HintPath>
     </Reference>
@@ -281,7 +284,10 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Module1.vb" />
+    <Compile Include="BotMain.vb" />
+    <Compile Include="Information.vb" />
+    <Compile Include="DownloadHelper.vb" />
+    <Compile Include="MusicBot.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
