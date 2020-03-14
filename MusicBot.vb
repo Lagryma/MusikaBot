@@ -240,7 +240,25 @@ Namespace DiscordMusicBot
                             End Using
                         End If
 
-                    Case "!pause"
+                    Case "!random"
+                        If parameter IsNot Nothing Then
+                            Dim r As Random = New Random()
+                            Dim errorRnd As Boolean = False
+
+                            Try
+                                Await _textChannel.SendMessageAsync($"<@{socketMsg.Author.Id}>'s random number is {r.Next(0, Integer.Parse(parameter))}.")
+                            Catch ex As Exception
+                                Print($"Parameter is not a number! {ex.Message}", ConsoleColor.Red)
+                                errorRnd = True
+                            End Try
+
+                            If errorRnd Then
+                                Await _textChannel.SendMessageAsync($"Sorry <@{socketMsg.Author.Id}>, but that was not a valid number!" & ImABot)
+                            End If
+                        Else
+                            Await _textChannel.SendMessageAsync($"Sorry <@{socketMsg.Author.Id}>, but your request needs a numeric parameter!" & ImABot)
+                        End If
+                            Case "!pause"
                         Pause = True
                         Print("Playback paused!", ConsoleColor.Magenta)
                         Await _textChannel.SendMessageAsync($"<@{socketMsg.Author}> paused playback!" & ImABot)
@@ -260,7 +278,7 @@ Namespace DiscordMusicBot
                         If _voiceChannel Is Nothing Then
                             Print("Error joining Voice Channel!", ConsoleColor.Red)
                             Await socketMsg.Channel.SendMessageAsync($"I can't connect to your Voice Channel <@{socketMsg.Author}>!" & ImABot)
-                        Else
+                                Else
                             Print($"Joined Voice Channel ""{_voiceChannel.Name}""", ConsoleColor.Magenta)
                             _audio = Await _voiceChannel.ConnectAsync()
                         End If
@@ -348,6 +366,7 @@ Namespace DiscordMusicBot
             builder.AddField("`!clear`", "Clear queue and current Song")
             builder.AddField("`!come`", "Let Bot join your Channel")
             builder.AddField("`!update`", "Updates Permitted Clients from File")
+            builder.AddField("`!random [max_number]`", "Generates random number from 1 to the parameter given")
             Return builder.Build()
         End Function
 
