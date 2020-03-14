@@ -75,8 +75,10 @@ Namespace DiscordMusicBot
                     Dim count As Integer = 0
 
                     Do
-                        filePath = Path.Combine(DownloadPath, "botsong" & System.Threading.Interlocked.Increment(count) & ".mp3")
+                        filePath = Path.Combine(DownloadPath, "songItem" & System.Threading.Interlocked.Increment(count) & ".mp3")
                     Loop While File.Exists(filePath)
+
+                    MusicBot.Print($"Song downloaded as {filePath}.", ConsoleColor.Green)
 
                     Dim youtubedl As Process
                     Dim youtubedlDownload As ProcessStartInfo = New ProcessStartInfo() With {
@@ -113,8 +115,10 @@ Namespace DiscordMusicBot
                     Dim count As Integer = 0
 
                     Do
-                        filePath = Path.Combine(DownloadPath, "tempvideo" & System.Threading.Interlocked.Increment(count) & ".mp3")
+                        filePath = Path.Combine(DownloadPath, "playListItem" & System.Threading.Interlocked.Increment(count) & ".mp3")
                     Loop While File.Exists(filePath)
+
+                    MusicBot.Print($"Song downloaded as {filePath}.", ConsoleColor.Green)
 
                     Dim youtubedl As Process
                     Dim youtubedlDownload As ProcessStartInfo = New ProcessStartInfo() With {
