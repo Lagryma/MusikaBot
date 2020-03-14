@@ -22,7 +22,7 @@ Namespace DiscordMusicBot
         Private _disposeToken As CancellationTokenSource
         Private _audio As IAudioClient
         Private Const ImABot As String = " *I'm a Bot, beep boop blop*"
-        Private ReadOnly _commands As String() = {"!help", "!queue", "!add", "!addPlaylist", "!pause", "!play", "!clear", "!come", "!update", "!skip"}
+        Private ReadOnly _commands As String() = {"!help", "!queue", "!random", "!add", "!addPlaylist", "!pause", "!play", "!clear", "!come", "!update", "!skip"}
         Private _queue As Queue(Of Tuple(Of String, String, String, String))
 
         Private Property Pause As Boolean
@@ -240,25 +240,7 @@ Namespace DiscordMusicBot
                             End Using
                         End If
 
-                    Case "!random"
-                        If parameter IsNot Nothing Then
-                            Dim r As Random = New Random()
-                            Dim errorRnd As Boolean = False
-
-                            Try
-                                Await _textChannel.SendMessageAsync($"<@{socketMsg.Author.Id}>'s random number is {r.Next(0, Integer.Parse(parameter))}.")
-                            Catch ex As Exception
-                                Print($"Parameter is not a number! {ex.Message}", ConsoleColor.Red)
-                                errorRnd = True
-                            End Try
-
-                            If errorRnd Then
-                                Await _textChannel.SendMessageAsync($"Sorry <@{socketMsg.Author.Id}>, but that was not a valid number!" & ImABot)
-                            End If
-                        Else
-                            Await _textChannel.SendMessageAsync($"Sorry <@{socketMsg.Author.Id}>, but your request needs a numeric parameter!" & ImABot)
-                        End If
-                            Case "!pause"
+                    Case "!pause"
                         Pause = True
                         Print("Playback paused!", ConsoleColor.Magenta)
                         Await _textChannel.SendMessageAsync($"<@{socketMsg.Author}> paused playback!" & ImABot)
@@ -325,6 +307,24 @@ Namespace DiscordMusicBot
                         Await _textChannel.SendMessageAsync($"<@{socketMsg.Author}> skipped **{_queue.Peek().Item2}**!")
                         Skip = True
                         Pause = False
+                    Case "!random"
+                        If parameter IsNot Nothing Then
+                            Dim r As Random = New Random()
+                            Dim errorRnd As Boolean = False
+
+                            Try
+                                Await _textChannel.SendMessageAsync($"<@{socketMsg.Author.Id}>'s random number is {r.Next(0, Integer.Parse(parameter))}.")
+                            Catch ex As Exception
+                                Print($"Parameter is not a number! {ex.Message}", ConsoleColor.Red)
+                                errorRnd = True
+                            End Try
+
+                            If errorRnd Then
+                                Await _textChannel.SendMessageAsync($"Sorry <@{socketMsg.Author.Id}>, but that was not a valid number!" & ImABot)
+                            End If
+                        Else
+                            Await _textChannel.SendMessageAsync($"Sorry <@{socketMsg.Author.Id}>, but your request needs a numeric parameter!" & ImABot)
+                        End If
                     Case Else
                 End Select
 
