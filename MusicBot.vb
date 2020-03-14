@@ -164,14 +164,6 @@ Namespace DiscordMusicBot
                     Return
                 End If
 
-                If Not _permittedUsers.Contains(socketMsg.Author.ToString()) Then
-                    Console.WriteLine(socketMsg.Author.ToString)
-                    Console.WriteLine(_permittedUsers)
-                    Await _textChannel.SendMessageAsync("Sorry, but you're not yet permitted to do that!")
-                    'Await dm.SendMessageAsync("Sorry, but you're not allowed to do that!" & ImABot)
-                    Return
-                End If
-
                 Dim split As String() = msg.Split(" "c)
                 Dim command As String = split(0).ToLower()
                 Dim parameter As String = Nothing
@@ -213,6 +205,14 @@ Namespace DiscordMusicBot
                         End If
 
                     Case "!addPlaylist"
+
+                        If Not _permittedUsers.Contains(socketMsg.Author.ToString()) Then
+                            Console.WriteLine(socketMsg.Author.ToString)
+                            Console.WriteLine(_permittedUsers)
+                            Await _textChannel.SendMessageAsync("Sorry, but you're not yet permitted to do that!")
+                            'Await dm.SendMessageAsync("Sorry, but you're not allowed to do that!" & ImABot)
+                            Return
+                        End If
 
                         If parameter IsNot Nothing Then
 
@@ -267,11 +267,27 @@ Namespace DiscordMusicBot
                         Print("Playback continued!", ConsoleColor.Magenta)
                         Await _textChannel.SendMessageAsync($"<@{socketMsg.Author}> resumed playback!" & ImABot)
                     Case "!clear"
+                        If Not _permittedUsers.Contains(socketMsg.Author.ToString()) Then
+                            Console.WriteLine(socketMsg.Author.ToString)
+                            Console.WriteLine(_permittedUsers)
+                            Await _textChannel.SendMessageAsync("Sorry, but you're not yet permitted to do that!")
+                            'Await dm.SendMessageAsync("Sorry, but you're not allowed to do that!" & ImABot)
+                            Return
+                        End If
+
                         Pause = True
                         _queue.Clear()
                         Print("Playlist cleared!", ConsoleColor.Magenta)
                         Await SendMessage($"<@{socketMsg.Author.Id}> cleared the Playlist!" & ImABot)
                     Case "!come"
+                        If Not _permittedUsers.Contains(socketMsg.Author.ToString()) Then
+                            Console.WriteLine(socketMsg.Author.ToString)
+                            Console.WriteLine(_permittedUsers)
+                            Await _textChannel.SendMessageAsync("Sorry, but you're not yet permitted to do that!")
+                            'Await dm.SendMessageAsync("Sorry, but you're not allowed to do that!" & ImABot)
+                            Return
+                        End If
+
                         _audio?.Dispose()
                         _voiceChannel = (TryCast(socketMsg.Author, IGuildUser))?.VoiceChannel
 
@@ -284,11 +300,27 @@ Namespace DiscordMusicBot
                         End If
 
                     Case "!update"
+                        If Not _permittedUsers.Contains(socketMsg.Author.ToString()) Then
+                            Console.WriteLine(socketMsg.Author.ToString)
+                            Console.WriteLine(_permittedUsers)
+                            Await _textChannel.SendMessageAsync("Sorry, but you're not yet permitted to do that!")
+                            'Await dm.SendMessageAsync("Sorry, but you're not allowed to do that!" & ImABot)
+                            Return
+                        End If
+
                         ReadConfig()
                         Print("User Config Updated!", ConsoleColor.Magenta)
                         Await _textChannel.SendMessageAsync("Updated user permitted list!")
                         'Await dm.SendMessageAsync("Updated Permitted Users List!")
                     Case "!skip"
+                        If Not _permittedUsers.Contains(socketMsg.Author.ToString()) Then
+                            Console.WriteLine(socketMsg.Author.ToString)
+                            Console.WriteLine(_permittedUsers)
+                            Await _textChannel.SendMessageAsync("Sorry, but you're not yet permitted to do that!")
+                            'Await dm.SendMessageAsync("Sorry, but you're not allowed to do that!" & ImABot)
+                            Return
+                        End If
+
                         Print("Song Skipped!", ConsoleColor.Magenta)
                         Await _textChannel.SendMessageAsync($"<@{socketMsg.Author}> skipped **{_queue.Peek().Item2}**!")
                         Skip = True
