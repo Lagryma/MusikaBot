@@ -139,9 +139,9 @@ Namespace DiscordMusicBot
                     End If
                 Else
 
-                    If socketMsg.Channel.Name = Information.TextChannelName Then
-                        Await socketMsg.DeleteAsync()
-                    End If
+                    'If socketMsg.Channel.Name = Information.TextChannelName Then
+                    '    Await socketMsg.DeleteAsync()
+                    'End If
 
                     Return
                 End If
@@ -184,6 +184,7 @@ Namespace DiscordMusicBot
 
                             Using _textChannel.EnterTypingState()
                                 Dim result As Boolean = Uri.TryCreate(parameter, UriKind.Absolute, uriResult) AndAlso (uriResult.Scheme = "http" OrElse uriResult.Scheme = "https")
+                                Dim errorDl As Boolean = False
 
                                 If result Then
 
@@ -198,8 +199,13 @@ Namespace DiscordMusicBot
                                         Print($"Song added to playlist! ({vidInfo.Item2} ({vidInfo.Item3}))!", ConsoleColor.Magenta)
                                     Catch ex As Exception
                                         Print($"Could not download Song! {ex.Message}", ConsoleColor.Red)
+                                        errorDl = True
                                         'Await SendMessage($"Sorry <@{socketMsg.Author.Id}>, unfortunately I can't play that Song!" & ImABot)
                                     End Try
+
+                                    If errorDl Then
+                                        Await SendMessage($"Sorry <@{socketMsg.Author.Id}>, unfortunately I can't play that Song!" & ImABot)
+                                    End If
                                 Else
                                     Await _textChannel.SendMessageAsync($"Sorry <@{socketMsg.Author.Id}>, but that was not a valid URL!" & ImABot)
                                 End If
@@ -408,7 +414,8 @@ Namespace DiscordMusicBot
         Private Shared Function GetFfmpeg(ByVal path As String) As Process
             Dim ffmpeg As ProcessStartInfo = New ProcessStartInfo With {
                 .FileName = "ffmpeg",
-                .Arguments = $"-xerror -i ""{path}"" -ac 2 -f s16le -ar 48000 pipe:1",
+                .Arguments = $"-hide_banner -loglevel panic -i ""{path}"" -ac 2 -f s16le -ar 48000 pipe:1",
+                .UseShellExecute = False,
                 .RedirectStandardOutput = True
             }
             Return Process.Start(ffmpeg)
@@ -418,6 +425,7 @@ Namespace DiscordMusicBot
             Dim ffplay As ProcessStartInfo = New ProcessStartInfo With {
                 .FileName = "ffplay",
                 .Arguments = $"-i ""{path}"" -ac 2 -f s16le -ar 48000 pipe:1 -autoexit",
+                .UseShellExecute = False,
                 .RedirectStandardOutput = True
             }
             Return New Process With {
@@ -425,29 +433,48 @@ Namespace DiscordMusicBot
             }
         End Function
 
+        Private Async Function SendAudio1(ByVal path As String) As Task
+            Dim ffmpeg As Process = GetFfmpeg(path)
+
+            Using discord As AudioOutStream = _audio.CreatePCMStream(AudioApplication.Music)
+                While True
+
+                    If ffmpeg.HasExited Then
+                        Exit While
+                    End If
+
+                    Await ffmpeg.StandardOutput.BaseStream.CopyToAsync(discord)
+                End While
+
+                Await discord.FlushAsync()
+            End Using
+        End Function
+
         Private Async Function SendAudio(ByVal path As String) As Task
             Dim ffmpeg As Process = GetFfmpeg(path)
+            Console.WriteLine(ffmpeg)
 
             Using output As Stream = ffmpeg.StandardOutput.BaseStream
 
-                Using discord As AudioOutStream = _audio.CreatePCMStream(AudioApplication.Mixed, 1920)
+                Using discord As AudioOutStream = _audio.CreatePCMStream(AudioApplication.Music)
+
                     Dim bufferSize As Integer = 1024
                     Dim bytesSent As Integer = 0
                     Dim fail As Boolean = False
                     Dim [exit] As Boolean = False
                     Dim buffer As Byte() = New Byte(bufferSize - 1) {}
 
-                    While Not Skip AndAlso Not fail AndAlso Not _disposeToken.IsCancellationRequested AndAlso Not [exit]
+                    While Not Skip AndAlso Not fail AndAlso Not [exit]
 
                         Try
-                            Dim read As Integer = Await output.ReadAsync(buffer, 0, bufferSize, _disposeToken.Token)
+                            Dim read As Integer = Await output.ReadAsync(buffer, 0, bufferSize)
 
                             If read = 0 Then
                                 [exit] = True
                                 Exit While
                             End If
 
-                            Await discord.WriteAsync(buffer, 0, read, _disposeToken.Token)
+                            Await discord.WriteAsync(buffer, 0, read)
 
                             If Pause Then
                                 Dim pauseAgain As Boolean
@@ -538,4 +565,5 @@ Namespace DiscordMusicBot
             Throw New NotImplementedException()
         End Sub
     End Class
+
 End Namespace
